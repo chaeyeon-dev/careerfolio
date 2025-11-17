@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 - CareerFolio</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+        .signup-container {
+            max-width: 450px;
+            margin: 60px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .btn-main {
+            background-color: #1A73E8;
+            color: white;
+        }
+        .btn-main:hover {
+            background-color: #1558b0;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+
+    <div class="form-title">회원가입</div>
+
+    <form th:action="@{/member/signup}" th:object="${memberDto}" method="post">
+
+        <!-- 아이디 -->
+        <div class="mb-3">
+            <label class="form-label">아이디</label>
+            <input type="text" th:field="*{username}" class="form-control" placeholder="아이디 입력">
+            <div class="text-danger small" th:errors="*{username}"></div>
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="mb-3">
+            <label class="form-label">비밀번호</label>
+            <input type="password" th:field="*{password1}" class="form-control" placeholder="비밀번호 입력">
+            <div class="text-danger small" th:errors="*{password1}"></div>
+        </div>
+
+        <!-- 비밀번호 확인 -->
+        <div class="mb-3">
+            <label class="form-label">비밀번호 확인</label>
+            <input type="password" th:field="*{password2}" class="form-control" placeholder="비밀번호 확인">
+            <div class="text-danger small" th:errors="*{password2}"></div>
+        </div>
+
+        <!-- 이메일 -->
+        <div class="mb-3">
+            <label class="form-label">이메일</label>
+            <input type="email" th:field="*{email}" class="form-control" placeholder="example@email.com">
+            <div class="text-danger small" th:errors="*{email}"></div>
+        </div>
+
+        <!-- 가입 버튼 -->
+        <button type="submit" class="btn btn-main w-100 mt-3">가입하기</button>
+    </form>
+
+</div>
+
+</body>
+</html>

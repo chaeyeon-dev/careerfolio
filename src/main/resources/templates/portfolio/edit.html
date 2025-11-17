@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout :: layout(~{::content})">
+
+<th:block th:fragment="content">
+
+    <div class="container" style="max-width: 700px; margin-top: 40px;">
+        <div class="card shadow-sm p-4">
+
+            <h2 class="fw-bold mb-4">포트폴리오 수정</h2>
+
+            <form th:action="@{|/portfolio/edit/${portfolio.id}|}" method="post">
+
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+                <div class="mb-3">
+                    <label class="form-label">제목</label>
+                    <input type="text" class="form-control"
+                           name="title"
+                           th:value="${portfolio.title}">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">내용</label>
+                    <textarea class="form-control" name="content" rows="8"
+                              th:text="${portfolio.content}"></textarea>
+                </div>
+
+                <!-- 🔥 공개 여부 체크박스 -->
+                <div class="form-check mb-4">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="publicState"
+                           value="true"
+                           id="publicCheck"
+                           th:checked="${portfolio.public}">
+                    <label class="form-check-label" for="publicCheck">공개 포트폴리오</label>
+                </div>
+
+                <button class="btn btn-primary w-100">수정 완료</button>
+            </form>
+
+        </div>
+    </div>
+
+</th:block>
+
+</html>

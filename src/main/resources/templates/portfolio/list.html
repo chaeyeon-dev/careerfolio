@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts/layout :: layout(~{::content})">
+
+<head>
+    <title>포트폴리오 목록 - CareerFolio</title>
+
+    <style>
+        /* 🔥 3열 그리드 */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        /* 카드 박스 */
+        .portfolio-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+
+        /* 썸네일 */
+        .thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #f3f3f3;
+        }
+
+        /* 텍스트 영역 */
+        .portfolio-info {
+            padding: 12px 14px;
+        }
+
+        .portfolio-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .portfolio-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .portfolio-meta span {
+            margin-right: 6px;
+        }
+    </style>
+
+</head>
+
+<th:block th:fragment="content">
+
+    <div class="container" style="max-width: 1200px; margin-top: 40px;">
+
+        <h2 class="fw-bold mb-4">포트폴리오 목록</h2>
+
+        <div th:if="${#lists.isEmpty(portfolioList)}"
+             class="alert alert-info">
+            작성된 포트폴리오가 없습니다.
+        </div>
+
+        <!-- 🔥 Behance 스타일 3열 갤러리 -->
+        <div class="portfolio-grid">
+
+            <div th:each="portfolio : ${portfolioList}"
+                 class="portfolio-card"
+                 th:onclick="|location.href='/portfolio/detail/${portfolio.id}'|">
+
+                <!-- 썸네일 -->
+                <img th:if="${portfolio.thumbnailUrl != null}"
+                     th:src="@{${portfolio.thumbnailUrl}}"
+                     class="thumbnail">
+
+                <img th:if="${portfolio.thumbnailUrl == null}"
+                     src="/images/default-thumbnail.jpg"
+                     class="thumbnail">
+
+                <!-- 정보 -->
+                <div class="portfolio-info">
+
+                    <div class="portfolio-title"
+                         th:text="${portfolio.title}">
+                    </div>
+
+                    <div class="portfolio-meta">
+                        <span th:text="${portfolio.member.username}"></span>
+                        ·
+                        <span th:text="${#temporals.format(portfolio.createdAt, 'yyyy-MM-dd')}"></span>
+                        ·
+                        <span th:text="${portfolio.views + ' 조회'}"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</th:block>
+
+</html>

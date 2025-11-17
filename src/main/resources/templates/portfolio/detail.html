@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layouts/layout :: layout(~{::content})">
+
+<head>
+    <title th:text="${portfolio.title} + ' - 상세보기'"></title>
+</head>
+
+<th:block th:fragment="content">
+
+    <div class="container" style="max-width: 900px; margin-top: 40px;">
+
+        <div class="card shadow-sm p-4">
+
+            <!-- 🔥 제목 -->
+            <h2 class="fw-bold mb-2" th:text="${portfolio.title}"></h2>
+
+            <!-- 🔥 공개/비공개 뱃지 -->
+            <div class="mb-2">
+                <span th:if="${portfolio.isPublic}" class="badge bg-success">공개</span>
+                <span th:unless="${portfolio.isPublic}" class="badge bg-secondary">비공개</span>
+            </div>
+
+            <!-- 🔥 작성자 + 날짜 + 조회수 -->
+            <div class="text-muted mb-4">
+                <span th:text="'작성자: ' + ${portfolio.member.username}"></span>
+                &nbsp; | &nbsp;
+                <span th:text="${#temporals.format(portfolio.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                &nbsp; | &nbsp;
+                <span th:text="'조회수: ' + ${portfolio.views}"></span>
+            </div>
+
+            <hr>
+
+            <!-- 🔥 썸네일 이미지 표시 -->
+            <div class="mb-4 text-center">
+                <img th:if="${portfolio.thumbnailUrl != null}"
+                     th:src="@{${portfolio.thumbnailUrl}}"
+                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px;">
+
+                <img th:if="${portfolio.thumbnailUrl == null}"
+                     src="/images/default-thumbnail.jpg"
+                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px;">
+            </div>
+
+            <hr>
+
+            <!-- 🔥 내용 -->
+            <div class="mt-4" style="white-space: pre-line; font-size: 1.1rem;"
+                 th:text="${portfolio.content}">
+            </div>
+
+            <hr>
+
+            <div class="mt-3 d-flex justify-content-between">
+
+                <!-- 🔥 목록으로 -->
+                <a href="/portfolio/my" class="btn btn-secondary">
+                    목록으로
+                </a>
+
+                <div>
+
+                    <!-- 🔥 수정 버튼 -->
+                    <a th:if="${#authentication.name == portfolio.member.username}"
+                       th:href="@{|/portfolio/edit/${portfolio.id}|}"
+                       class="btn btn-primary me-2">
+                        수정하기
+                    </a>
+
+                    <!-- 🔥 삭제 버튼 -->
+                    <form th:if="${#authentication.name == portfolio.member.username}"
+                          th:action="@{|/portfolio/delete/${portfolio.id}|}"
+                          method="post"
+                          style="display:inline-block;">
+                        <button class="btn btn-danger"
+                                onclick="return confirm('정말 삭제하시겠습니까?');">
+                            삭제하기
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</th:block>
+
+</html>
