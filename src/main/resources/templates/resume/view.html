@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}"
+      lang="ko">
+
+<th:block layout:fragment="content">
+
+    <style>
+        .resume-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 40px;
+            align-items: flex-start;
+        }
+        .resume-box {
+            width: 48%;
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            vertical-align: top;
+        }
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            width: 20%;
+        }
+        .photo-box {
+            width: 150px;
+            height: 180px;
+            background: #eee;
+            text-align: center;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .download-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+    <div class="download-btn">
+        <a th:href="@{'/resume/print/' + ${resume.id}}" class="btn btn-primary">
+            PDF 다운로드
+        </a>
+    </div>
+
+    <div class="resume-container">
+
+
+        <div class="resume-box">
+            <div class="section-title">이력서</div>
+
+            <table>
+                <tr>
+                    <td rowspan="4" style="width:160px; text-align:center">
+                        <img th:src="${resume.photoPath != null ? resume.photoPath : '/images/default_profile.png'}"
+                             style="width:150px; height:180px; object-fit:cover;">
+                    </td>
+                    <th>성명</th>
+                    <td th:text="${resume.name}"></td>
+                </tr>
+                <tr>
+                    <th>이메일</th>
+                    <td th:text="${resume.email}"></td>
+                </tr>
+                <tr>
+                    <th>전화번호</th>
+                    <td th:text="${resume.phone}"></td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td th:text="${resume.address}"></td>
+                </tr>
+            </table>
+
+            <h5><b>보유 기술</b></h5>
+            <table>
+                <tr>
+                    <th>사용 프로그램</th>
+                    <th>수준</th>
+                    <th>비고</th>
+                </tr>
+                <tr th:each="s : ${skills}">
+                    <td th:text="${s['skillName'] != null ? s['skillName'] : s['program']}"></td>
+                    <td th:text="${s['level']}"></td>
+                    <td th:text="${s['note']}"></td>
+                </tr>
+            </table>
+
+            <h5><b>자격증</b></h5>
+            <table>
+                <tr>
+                    <th>취득연도</th>
+                    <th>자격증명</th>
+                    <th>등급</th>
+                    <th>발행처</th>
+                </tr>
+                <tr th:each="c : ${certs}">
+                    <td th:text="${c.year}"></td>
+                    <td th:text="${c.name}"></td>
+                    <td th:text="${c.grade}"></td>
+                    <td th:text="${c.issuer}"></td>
+                </tr>
+            </table>
+
+            <h5><b>학력</b></h5>
+            <table>
+                <tr>
+                    <th>학교명</th>
+                    <th>전공</th>
+                    <th>학위</th>
+                    <th>재학기간</th>
+                    <th>학점</th>
+                </tr>
+                <tr th:each="e : ${edus}">
+                    <td th:text="${e.school}"></td>
+                    <td th:text="${e.major}"></td>
+                    <td th:text="${e.degree}"></td>
+                    <td th:text="${e.duration}"></td>
+                    <td th:text="${e.grade}"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="resume-box">
+            <div class="section-title">자기소개서</div>
+
+            <table>
+                <tr><th>성장과정</th></tr>
+                <tr><td th:utext="${resume.growth}"></td></tr>
+
+                <tr><th>지원동기</th></tr>
+                <tr><td th:utext="${resume.motivation}"></td></tr>
+
+                <tr><th>성격의 장단점</th></tr>
+                <tr><td th:utext="${resume.personality}"></td></tr>
+
+                <tr><th>입사 후 포부</th></tr>
+                <tr><td th:utext="${resume.future}"></td></tr>
+            </table>
+        </div>
+    </div>
+</th:block>
+</html>

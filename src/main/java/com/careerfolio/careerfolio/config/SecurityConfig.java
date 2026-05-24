@@ -5,11 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -20,11 +16,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/member/login", "/member/signup",
-                                "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/member/login", "/member/signup",
+
+                                "/css/**", "/js/**", "/images/**", "/uploads/**",
+
+                                "/portfolio/viewPDF/**",
+                                "/resume/pdf/**",
+
+                                "/portfolio/list",
+                                "/portfolio/detail/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
@@ -36,11 +43,15 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
+                        .deleteCookies("JSESSIONID", "remember-me")
                         .permitAll()
-                );
-
-        // ❗ 필요 없음: HttpSecurity는 자동으로 UserDetailsService를 등록함
-        // .userDetailsService(customUserDetailsService);
+                )
+                .rememberMe(remember -> remember
+                        .key("careerfolio-remember-me-key")          // 아무 문자열 가능
+                        .tokenValiditySeconds(7 * 24 * 60 * 60)      // 7일 유지
+                        .userDetailsService(customUserDetailsService)
+                )
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }
@@ -50,5 +61,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
-

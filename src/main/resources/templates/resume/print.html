@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>이력서 PDF</title>
+
+    <style>
+        body {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+            background: white;
+        }
+
+        /* PDF 다운로드/인쇄 버튼 */
+        .btn-area {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .btn-area button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+        }
+        .btn-pdf {
+            background: #007bff;
+        }
+        .btn-print {
+            background: #555;
+            margin-left: 6px;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 277mm;
+            padding-bottom: 20mm;
+            box-sizing: border-box;
+            page-break-after: always;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+        }
+
+        th {
+            background: #e6e6e6;
+            font-weight: 600;
+        }
+
+        .photo-cell {
+            width: 130px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .photo {
+            width: 110px;
+            height: 140px;
+            object-fit: cover;
+            border: 1px solid #999;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0 10px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* table break 방지 */
+        table, tr, td, th {
+            page-break-inside: avoid;
+        }
+        @media print {
+    .btn-area {
+        display: none !important;
+    }
+}
+
+    </style>
+</head>
+
+<body>
+
+<div class="btn-area">
+    <button class="btn-pdf" id="btnPdf">PDF 다운로드</button>
+    <button class="btn-print" onclick="window.print()">인쇄하기</button>
+</div>
+
+<div class="page">
+
+    <div class="title">이력서</div>
+
+    <table>
+        <tr>
+            <td rowspan="4" class="photo-cell">
+                <img th:src="${resume.photoPath != null ? resume.photoPath : '/images/default_profile.png'}"
+                     style="width:150px; height:180px; object-fit:cover;">            </td>
+            <th>성명</th>
+            <td th:text="${resume.name}"></td>
+            <th>이메일</th>
+            <td th:text="${resume.email}"></td>
+        </tr>
+        <tr>
+            <th>생년월일</th>
+            <td th:text="${resume.birthday}"></td>
+            <th>전화번호</th>
+            <td th:text="${resume.phone}"></td>
+        </tr>
+        <tr>
+            <th>주소</th>
+            <td colspan="3" th:text="${resume.address}"></td>
+        </tr>
+    </table>
+
+    <!-- 보유 기술 -->
+    <div class="section-title">보유 기술</div>
+    <table>
+        <thead>
+        <tr>
+            <th>사용 프로그램</th>
+            <th>수준</th>
+            <th>비고</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${skills}">
+            <td th:text="${s['skillName'] != null ? s['skillName'] : s['program']}"></td>
+            <td th:text="${s['level']}"></td>
+            <td th:text="${s['note']}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 자격증 -->
+    <div class="section-title">자격증</div>
+    <table>
+        <thead>
+        <tr>
+            <th>취득연도</th>
+            <th>자격증</th>
+            <th>등급</th>
+            <th>발행처</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${certs}">
+            <td th:text="${c.year}"></td>
+            <td th:text="${c.name}"></td>
+            <td th:text="${c.grade}"></td>
+            <td th:text="${c.issuer}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 학력 -->
+    <div class="section-title">학력</div>
+    <table>
+        <thead>
+        <tr>
+            <th>학교명</th>
+            <th>전공</th>
+            <th>학위</th>
+            <th>재학기간</th>
+            <th>학점</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="e : ${edus}">
+            <td th:text="${e.school}"></td>
+            <td th:text="${e.major}"></td>
+            <td th:text="${e.degree}"></td>
+            <td th:text="${e.duration}"></td>
+            <td th:text="${e.grade}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="page">
+
+    <div class="title">자기소개서</div>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width:130px;">항목</th>
+            <th>내용</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>성장과정</td>
+            <td th:text="${resume.growth}"></td>
+        </tr>
+        <tr>
+            <td>지원동기</td>
+            <td th:text="${resume.motivation}"></td>
+        </tr>
+        <tr>
+            <td>성격의 장단점</td>
+            <td th:text="${resume.personality}"></td>
+        </tr>
+        <tr>
+            <td>입사 후 포부</td>
+            <td th:text="${resume.future}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    document.getElementById("btnPdf").addEventListener("click", () => {
+
+        const btnArea = document.querySelector('.btn-area');
+
+        btnArea.style.display = 'none';
+
+        const element = document.body;
+        const options = {
+            margin: 0,
+            filename: 'resume.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf()
+            .set(options)
+            .from(element)
+            .save()
+            .then(() => {
+                // PDF 생성 완료 후 다시 버튼 보이게
+                btnArea.style.display = '';
+            });
+    });
+</script>
+
+</body>
+</html>

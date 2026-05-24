@@ -2,40 +2,67 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="ko">
-<head>
-    <meta charset="UTF-8">
-</head>
 
 <body>
-<header th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
+<div th:fragment="header">
+
+    <style>
+        .navbar .nav-link {
+            color: #fff !important;
+        }
+        .navbar .navbar-brand {
+            color: #fff !important;
+        }
+        .btn-login, .btn-signup, .btn-logout {
+            font-weight: 600;
+        }
+    </style>
+
+    <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+        <div class="container-fluid px-4">
+
+
             <a class="navbar-brand fw-bold" href="/">CareerFolio</a>
 
-            <ul class="navbar-nav ms-auto">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <!-- 🔹 비로그인 사용자 -->
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="nav-link" href="/member/signup">회원가입</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAnonymous()">
-                    <a class="btn btn-primary ms-2" href="/member/login">로그인</a>
-                </li>
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto align-items-center">
 
-                <!-- 🔹 로그인한 사용자 -->
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" href="/portfolio/my">내 포트폴리오</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="nav-link" href="/member/mypage">마이페이지</a>
-                </li>
-                <li class="nav-item" sec:authorize="isAuthenticated()">
-                    <a class="btn btn-outline-danger ms-2" href="/logout">로그아웃</a>
-                </li>
+                    <li class="nav-item"><a class="nav-link" href="/">홈</a></li>
 
-            </ul>
+                    <li class="nav-item"><a class="nav-link" href="/portfolio/create">포트폴리오 만들기</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/portfolio/list">포트폴리오 탐색</a></li>
+
+                    <li class="nav-item"><a class="nav-link" href="/resume/create">이력서 작성</a></li>
+
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="btn btn-light me-2" href="/member/signup">회원가입</a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="btn btn-outline-light" href="/member/login">로그인</a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/member/mypage">마이페이지</a>
+                    </li>
+
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form method="post" action="/logout" class="ms-2">
+                            <button class="btn btn-outline-light btn-logout" type="submit">로그아웃</button>
+                        </form>
+                    </li>
+
+                </ul>
+            </div>
+
         </div>
     </nav>
-</header>
+
+</div>
 </body>
 </html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="ko"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+    <title>내 포트폴리오 관리</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: #F7F9FC;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 26px;
+            margin-top: 10px;
+        }
+
+        .portfolio-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.25s ease;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            background: #f3f3f3;
+        }
+
+        .portfolio-info {
+            padding: 16px 20px;
+        }
+
+        .portfolio-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        .portfolio-meta {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 14px;
+        }
+
+
+        .btn-area {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<th:block layout:fragment="content">
+
+    <div class="container" style="max-width: 1280px; margin-top: 40px;">
+
+        <div class="page-title">내 포트폴리오 관리</div>
+
+        <div th:if="${#lists.isEmpty(portfolioList)}"
+             class="alert alert-info text-center py-4 fw-semibold">
+            아직 작성한 포트폴리오가 없습니다.
+        </div>
+
+        <div class="portfolio-grid" th:if="${!#lists.isEmpty(portfolioList)}">
+
+            <div class="portfolio-card" th:each="p : ${portfolioList}">
+
+                <a th:href="@{|/portfolio/detail/${p.id}|}">
+                    <img th:src="${p.thumbnailUrl != null ? p.thumbnailUrl : '/images/default-thumbnail.png'}"
+                         class="thumbnail">
+                </a>
+
+                <div class="portfolio-info">
+
+                    <div class="portfolio-title" th:text="${p.title}"></div>
+
+                    <div class="portfolio-meta">
+
+                    <span>
+                        <span th:text="${p.publicState ? '공개' : '비공개'}"
+                              style="font-weight:600; margin-right:12px;"></span>
+
+                        <i class="bi bi-eye-fill" style="margin-right:4px;"></i>
+                        <span th:text="${p.views}"></span>
+                    </span>
+
+                                        <span>
+                        <i class="bi bi-heart-fill" style="margin-right:4px;"></i>
+                        <span th:text="${p.likeCount}"></span>
+                    </span>
+
+                    </div>
+
+
+
+                    <div class="btn-area">
+
+                        <form th:action="@{|/portfolio/delete/${p.id}|}"
+                              method="post"
+                              onsubmit="return confirm('정말 삭제하시겠습니까?');"
+                              style="flex:1;">
+                            <button class="btn btn-danger w-100">
+                                <i class="bi bi-trash"></i>
+                                삭제
+                            </button>
+                        </form>
+
+                        <a th:href="@{|/portfolio/edit/${p.id}|}"
+                           class="btn btn-primary w-100"
+                           style="flex:1;">
+                            <i class="bi bi-pencil-square"></i>
+                            수정
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</th:block>
+
+</html>

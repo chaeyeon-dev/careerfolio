@@ -1,14 +1,18 @@
 package com.careerfolio.careerfolio.portfolio.controller;
 
+import com.careerfolio.careerfolio.comment.service.CommentService;
 import com.careerfolio.careerfolio.portfolio.entity.Portfolio;
 import com.careerfolio.careerfolio.portfolio.service.PortfolioService;
+import com.careerfolio.careerfolio.member.service.FavoriteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,56 +20,79 @@ import java.security.Principal;
 public class PortfolioController {
 
     private final PortfolioService portfolioService;
+    private final FavoriteService favoriteService;
+    private final CommentService commentService;
 
-    // ===============================
-    // 내 포트폴리오 목록 보기
-    // ===============================
-    @GetMapping("/my")
-    public String myList(Model model, Principal principal) {
+    // 공개 포트폴리오 리스트
+    @GetMapping("/list")
+    public String list(
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String keyword,
+            Model model,
+            Principal principal
+    ) {
+        String username = (principal != null) ? principal.getName() : null;
 
-        model.addAttribute("portfolioList",
-                portfolioService.getMyPortfolios(principal.getName()));
+        if (sort == null) sort = "latest";
+
+        List<Portfolio> list = portfolioService.getSortedPublicPortfolios(sort, keyword);
+
+        model.addAttribute("portfolioList", list);
+        model.addAttribute("username", username);
+        model.addAttribute("sort", sort);
+        model.addAttribute("keyword", keyword);
 
         return "portfolio/list";
     }
 
-    // ===============================
-    // 작성 페이지
-    // ===============================
+
     @GetMapping("/create")
-    public String createForm() {
+    public String createForm(Principal principal) {
+        if (principal == null) return "redirect:/member/login";
         return "portfolio/create";
     }
 
-    // ===============================
-    // 작성 처리 (썸네일 + PDF)
-    // ===============================
+
     @PostMapping("/create")
     public String create(
-            Principal principal,
             @RequestParam String title,
             @RequestParam String content,
-            @RequestParam(defaultValue = "false") boolean isPublic,
-            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile,
-            @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile
-    ) {
+            @RequestParam(defaultValue = "false") boolean publicState,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(required = false) String githubUrl,
+            @RequestParam(required = false) String deployUrl,
+            Principal principal
+    ) throws Exception {
 
-        portfolioService.create(
+
+        if (principal == null) return "redirect:/member/login";
+
+        Portfolio saved = portfolioService.createPortfolio(
                 principal.getName(),
                 title,
                 content,
-                isPublic,
-                thumbnailFile,
-                pdfFile
+                publicState,
+                file,
+                githubUrl,
+                deployUrl
         );
 
-        return "redirect:/portfolio/my";
+        return "redirect:/portfolio/detail/" + saved.getId();
     }
 
+    @GetMapping("/my")
+    public String myList(Model model, Principal principal) {
 
-    // ===============================
-    // 상세보기
-    // ===============================
+        if (principal == null) return "redirect:/member/login";
+
+        String username = principal.getName();
+
+        model.addAttribute("portfolioList", portfolioService.getMyPortfolios(username));
+        model.addAttribute("username", username);
+
+        return "portfolio/my";
+    }
+
     @GetMapping("/detail/{id}")
     public String detail(
             @PathVariable Long id,
@@ -73,79 +100,144 @@ public class PortfolioController {
             Principal principal
     ) {
 
-        if (principal == null) {
-            return "redirect:/member/login";
+        String username = (principal != null) ? principal.getName() : null;
+
+        Portfolio p = portfolioService.getOne(id);
+
+        // 비공개 보호
+        if (!p.isPublicState()) {
+            if (principal == null || !p.getMember().getUsername().equals(username)) {
+                return "redirect:/portfolio/list";
+            }
         }
 
-        Portfolio portfolio = portfolioService.getOne(id);
+        portfolioService.increaseViews(id, username);
 
-        // 🔥 비공개 + 작성자 아님 = 접근 불가
-        if (!portfolio.isPublic() &&
-                !portfolio.getMember().getUsername().equals(principal.getName())) {
-            return "redirect:/portfolio/my";
-        }
+        model.addAttribute("portfolio", p);
+        model.addAttribute("username", username);
 
-        model.addAttribute("portfolio", portfolio);
+        boolean isOwner = (principal != null &&
+                p.getMember().getUsername().equals(username));
+        model.addAttribute("isOwner", isOwner);
+
+        boolean favoriteSaved = favoriteService.isFavorite(username, id);
+        model.addAttribute("favoriteSaved", favoriteSaved);
+
+        boolean alreadyLiked = portfolioService.isLikedByUser(id, username);
+        model.addAttribute("alreadyLiked", alreadyLiked);
+
+        model.addAttribute("comments", commentService.getComments(p));
+
         return "portfolio/detail";
     }
 
-    // ===============================
-    // 수정 페이지
-    // ===============================
+
+    @PostMapping("/like/{id}")
+    public ResponseEntity<?> toggleLike(
+            @PathVariable Long id,
+            Principal principal
+    ) {
+
+        if (principal == null) {
+            return ResponseEntity.status(403)
+                    .body("{\"error\": \"NOT_LOGIN\"}");
+        }
+
+        String username = principal.getName();
+        String result = portfolioService.toggleLike(id, username);
+        int likeCount = portfolioService.getLikeCount(id);
+
+        return ResponseEntity.ok(
+                "{ \"result\": \"" + result + "\", \"likeCount\": " + likeCount + " }"
+        );
+    }
+
+
+    @PostMapping("/toggleFavorite/{id}")
+    public ResponseEntity<?> toggleFavorite(
+            @PathVariable Long id,
+            Principal principal
+    ) {
+
+        if (principal == null) {
+            return ResponseEntity.status(403)
+                    .body("{\"error\": \"NOT_LOGIN\"}");
+        }
+
+        String username = principal.getName();
+
+        boolean isSaved = favoriteService.isFavorite(username, id);
+
+        if (isSaved) {
+            favoriteService.removeFavorite(username, id);
+            return ResponseEntity.ok("{\"saved\": false}");
+        }
+
+        favoriteService.addFavorite(username, id);
+        return ResponseEntity.ok("{\"saved\": true}");
+    }
+
     @GetMapping("/edit/{id}")
     public String editForm(
             @PathVariable Long id,
-            Model model,
-            Principal principal
+            Principal principal,
+            Model model
     ) {
         if (principal == null) return "redirect:/member/login";
 
-        Portfolio portfolio = portfolioService.getOne(id);
+        Portfolio p = portfolioService.getOne(id);
 
-        if (!portfolio.getMember().getUsername().equals(principal.getName())) {
-            return "redirect:/portfolio/detail/" + id;
+        if (!p.getMember().getUsername().equals(principal.getName())) {
+            return "redirect:/portfolio/list";
         }
 
-        model.addAttribute("portfolio", portfolio);
+        model.addAttribute("portfolio", p);
+
         return "portfolio/edit";
     }
 
-    // ===============================
-    // 수정 처리 (썸네일 + PDF 수정 가능)
-    // ===============================
     @PostMapping("/edit/{id}")
     public String edit(
             @PathVariable Long id,
             @RequestParam String title,
             @RequestParam String content,
-            @RequestParam(defaultValue = "false") boolean isPublic,
-            @RequestParam(value = "thumbnail", required = false) MultipartFile thumbnailFile,
-            @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile,
+            @RequestParam(defaultValue = "false") boolean publicState,
+            @RequestParam(required = false) String githubUrl,
+            @RequestParam(required = false) String deployUrl,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam(value = "deleteFile", defaultValue = "false") boolean deleteFile,
             Principal principal
-    ) {
+    ) throws Exception {
 
-        portfolioService.update(
-                id,
-                title,
-                content,
-                isPublic,
-                principal.getName(),
-                thumbnailFile,
-                pdfFile
+        if (principal == null) return "redirect:/member/login";
+
+        Portfolio portfolio = portfolioService.getOne(id);
+
+        if (deleteFile) {
+            portfolioService.deletePortfolioFile(portfolio);
+        }
+
+        if (file != null && !file.isEmpty()) {
+            portfolioService.updatePortfolioFile(portfolio, file);
+        }
+
+        portfolioService.updateTextFields(
+                portfolio, title, content, publicState, githubUrl, deployUrl
         );
 
         return "redirect:/portfolio/detail/" + id;
     }
 
-    // ===============================
-    // 삭제
-    // ===============================
+
     @PostMapping("/delete/{id}")
     public String delete(
             @PathVariable Long id,
             Principal principal
     ) {
-        portfolioService.delete(id, principal.getName());
+        if (principal == null) return "redirect:/member/login";
+
+        portfolioService.deletePortfolio(id, principal.getName());
+
         return "redirect:/portfolio/my";
     }
 }

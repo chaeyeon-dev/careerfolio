@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+
+<th:block layout:fragment="content">
+
+    <style>
+        .favorites-container {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .profile-title {
+            font-size: 32px;
+            font-weight: 800;
+            padding-bottom: 10px;
+            margin: 0 0 20px 0;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 28px;
+        }
+
+
+        .portfolio-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transition: 0.25s ease;
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .writer {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        .info {
+            display: flex;
+            gap: 12px;
+            font-size: 14px;
+            color: #555;
+        }
+        .icon-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+    <div class="favorites-container">
+
+        <h2 class="profile-title">찜한 포트폴리오 목록</h2>
+
+        <div class="portfolio-grid">
+            <div class="portfolio-card" th:each="fav : ${favoriteList}">
+
+                <a th:href="@{/portfolio/detail/{id}(id=${fav.portfolio.id})}">
+                    <img th:src="@{${fav.portfolio.thumbnailUrl}}"
+                         class="thumbnail"
+                         th:if="${fav.portfolio.thumbnailUrl != null}">
+                </a>
+                <a th:href="@{/portfolio/detail/{id}(id=${fav.portfolio.id})}">
+                    <img th:src="@{/images/default-thumbnail.png}"
+                         class="thumbnail"
+                         th:if="${fav.portfolio.thumbnailUrl == null}">
+                </a>
+
+                <div class="card-body">
+                    <h5 class="title" th:text="${fav.portfolio.title}"></h5>
+                    <p class="writer" th:text="${fav.portfolio.member.name}"></p>
+
+                    <div class="icon-area">
+
+                        <div class="icon">
+                            <i class="bi bi-eye-fill"></i>
+                            <span th:text="${fav.portfolio.views}"></span>
+                        </div>
+
+                        <div class="icon">
+                            <i class="bi bi-heart-fill"></i>
+                            <span th:text="${fav.portfolio.likeCount}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

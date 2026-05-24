@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="content">
+
+    <style>
+        body {
+            background: #f5f5f5;
+        }
+
+        .main-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 40px !important;
+            align-items: start !important;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .preview-title {
+            font-size: 28px;
+            font-weight: 700;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .resume-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .resume-header-table td,
+        .resume-header-table th {
+            border: 1px solid #333;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .resume-header-table th {
+            background: #e0e0e0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .preview-photo {
+            width: 100px;
+            height: 130px;
+            border: 1px solid #999;
+            object-fit: cover;
+        }
+
+        .resume-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin: 20px 0 10px 0;
+        }
+
+        .dynamic-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+
+        #previewSelfIntroContent td,
+        #previewSelfIntroContent th {
+            word-break: break-word !important;
+            white-space: normal !important;
+        }
+
+
+        .preview-card td,
+        .preview-card th {
+            word-break: break-word !important;
+            white-space: normal !important;
+        }
+        #photoPreview {
+            display: none !important;
+        }
+        .photo-cell {
+            width: 150px !important;
+            height: 170px !important;
+            text-align: center;
+            vertical-align: middle;
+            padding: 5px;
+        }
+
+        .preview-photo {
+            width: 140px !important;
+            height: 160px !important;
+            object-fit: cover;
+            border: 1px solid #999;
+        }
+        textarea {
+            resize: none;
+            overflow: hidden;
+        }
+        #selfintro-pane textarea {
+            resize: none;
+            overflow: hidden;
+            height: auto;
+        }
+
+        #previewSelfIntroContent .resume-header-table th:first-child {
+            width: 100px !important;
+            white-space: nowrap;
+            vertical-align: top !important;
+        }
+
+
+        #previewSelfIntroContent .resume-header-table td:nth-child(2) {
+            vertical-align: top !important;
+            white-space: pre-wrap !important;
+        }
+
+        #previewSelfIntroContent .resume-header-table td {
+            width: auto;
+            vertical-align: top;
+        }
+        html, body {
+        background: #f5f5f5 !important;
+        }
+        #previewSelfIntroContent table td:first-child {
+            vertical-align: top !important;
+            white-space: nowrap !important;
+        }
+
+#previewSelfIntroContent {
+    padding: 0 !important;
+}
+
+.self-intro-content {
+    border: 1px solid #333;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.intro-item {
+    display: flex;
+    border-top: 1px solid #333;
+    page-break-inside: avoid;
+}
+
+.intro-item:first-child {
+    border-top: none;
+}
+
+.intro-title {
+    width: 120px;
+    padding: 10px;
+    font-weight: 600;
+    background-color: #f0f0f0;
+    border-right: 1px solid #333;
+    text-align: center;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+}
+
+
+.intro-text {
+    flex-grow: 1;
+    padding: 10px;
+    white-space: pre-wrap;
+    vertical-align: top;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+.self-intro-content {
+    border: 1px solid #333;
+    width: 100%;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.intro-header {
+    display: flex;
+    background: #e0e0e0;
+    border-bottom: 1px solid #333;
+}
+
+.intro-header .intro-title {
+    width: 120px;
+    padding: 10px;
+    font-weight: 700;
+    border-right: 1px solid #333;
+    text-align: center;
+}
+
+.intro-header .intro-title-content {
+    flex-grow: 1;
+    padding: 10px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.intro-item {
+    display: flex;
+    border-top: 1px solid #333;
+}
+
+.intro-text {
+    flex-grow: 1;
+    padding: 10px;
+    white-space: pre-wrap;
+    vertical-align: top;
+}
+
+    </style>
+
+    <div class="main-container">
+
+        <div>
+            <ul class="nav nav-tabs" id="editTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="resume-tab"
+                            data-bs-toggle="tab" data-bs-target="#resume-pane">
+                        이력서 수정
+                    </button>
+                </li>
+
+                <li class="nav-item">
+                    <button class="nav-link" id="selfintro-tab"
+                            data-bs-toggle="tab" data-bs-target="#selfintro-pane">
+                        자기소개서 수정
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+
+
+                <div class="tab-pane fade show active" id="resume-pane">
+
+                    <h2 class="section-title">개인 정보 수정</h2>
+                    <input type="hidden" id="resumeId" th:value="${resume.id}"/>
+
+                    <div class="mb-3">
+                        <label class="form-label">이력서 제목</label>
+                        <input type="text" id="title" class="form-control"
+                               th:value="${resume.title}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">이름</label>
+                        <input type="text" id="name" class="form-control"
+                               th:value="${resume.name}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">이메일</label>
+                        <input type="email" id="email" class="form-control"
+                               th:value="${resume.email}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">생년월일</label>
+                        <input type="text" id="birthday" class="form-control"
+                               th:value="${resume.birthday}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">전화번호</label>
+                        <input type="text" id="phone" class="form-control"
+                               th:value="${resume.phone}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">주소</label>
+                        <input type="text" id="address" class="form-control"
+                               th:value="${resume.address}" oninput="updatePreviewBasic()"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">사진 업로드</label>
+                        <input type="file" id="photoInput" class="form-control"
+                               onchange="previewPhotoFile(event)"/>
+
+                        <img id="photoPreview" class="preview-photo mt-2"
+                             th:src="${resume.photoPath ?: '/images/default-photo.png'}"/>
+
+                        <button type="button" class="btn btn-danger btn-sm mt-2"
+                                th:if="${resume.photoPath != null}"
+                                onclick="deletePhoto()">
+                            사진 삭제
+                        </button>
+
+                        <input type="hidden" id="deletePhotoFlag" value="false"/>
+                    </div>
+
+                    <h4 class="resume-section-title">보유 기술</h4>
+                    <div id="skillsContainer"></div>
+                    <button class="btn btn-primary btn-sm mt-2"
+                            onclick="addRow('skills')">+ 추가</button>
+
+                    <h4 class="resume-section-title mt-4">자격증</h4>
+                    <div id="certificateContainer"></div>
+                    <button class="btn btn-primary btn-sm mt-2"
+                            onclick="addRow('certificate')">+ 추가</button>
+
+                    <h4 class="resume-section-title mt-4">학력</h4>
+                    <div id="educationContainer"></div>
+
+                    <div class="mb-4">
+                        <button class="btn btn-primary btn-sm"
+                                onclick="addRow('education')">+ 추가</button>
+                    </div>
+
+                    <button id="saveBtnResume" class="btn btn-primary" style="margin-top: 20px;">
+                        이력서 수정 저장
+                    </button>
+                </div>
+
+
+                <div class="tab-pane fade" id="selfintro-pane">
+
+                    <h2 class="section-title">자기소개서 수정</h2>
+
+                    <div class="mb-3">
+                        <label class="form-label">성장과정</label>
+                        <textarea id="growth" class="form-control" rows="5" maxlength="800"
+                                  th:text="${resume.growth}"
+                                  oninput="updateSelfIntroAll('growth')"></textarea> <div class="text-end text-muted mt-1" id="growthCounter">0 / 800 자</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">지원동기</label>
+                        <textarea id="motivation" class="form-control" rows="5" maxlength="800"
+                                  th:text="${resume.motivation}"
+                                  oninput="updateSelfIntroAll('motivation')"></textarea> <div class="text-end text-muted mt-1" id="motivationCounter">0 / 800 자</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">성격의 장단점</label>
+                        <textarea id="personality" class="form-control" rows="5" maxlength="800"
+                                  th:text="${resume.personality}"
+                                  oninput="updateSelfIntroAll('personality')"></textarea> <div class="text-end text-muted mt-1" id="personalityCounter">0 / 800 자</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">입사 후 포부</label>
+                        <textarea id="future" class="form-control" rows="5" maxlength="800"
+                                  th:text="${resume.future}"
+                                  oninput="updateSelfIntroAll('future')"></textarea> <div class="text-end text-muted mt-1" id="futureCounter">0 / 800 자</div>
+                    </div>
+
+                    <button id="saveBtnSelfIntro" class="btn btn-primary mt-4">
+                        자기소개서 수정 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div>
+
+            <div id="previewResumeContent">
+                <div class="preview-card">
+
+                    <div class="preview-title">이력서</div>
+
+                    <table class="resume-header-table">
+                        <tr>
+                            <td class="photo-cell" rowspan="4">
+                                <img id="previewPhoto" class="preview-photo"
+                                     th:src="${resume.photoPath ?: '/images/default-photo.png'}" />
+                            </td>
+
+                            <th>성명</th>
+                            <td id="previewName" colspan="2"
+                                th:text="${resume.name}"></td>
+
+                            <th>이메일</th>
+                            <td id="previewEmail" colspan="2"
+                                th:text="${resume.email}"></td>
+                        </tr>
+
+                        <tr>
+                            <th>생년월일</th>
+                            <td id="previewBirthday" colspan="5"
+                                th:text="${resume.birthday}"></td>
+                        </tr>
+
+                        <tr>
+                            <th>전화번호</th>
+                            <td id="previewPhone" colspan="5"
+                                th:text="${resume.phone}"></td>
+                        </tr>
+
+                        <tr>
+                            <th>주소</th>
+                            <td id="previewAddress" colspan="5"
+                                th:text="${resume.address}"></td>
+                        </tr>
+                    </table>
+
+                    <h5 class="resume-section-title">보유 기술</h5>
+                    <table class="resume-header-table">
+                        <thead>
+                        <tr>
+                            <th>사용 프로그램</th>
+                            <th>수준</th>
+                            <th>비고</th>
+                        </tr>
+                        </thead>
+                        <tbody id="previewSkillsContainer"></tbody>
+                    </table>
+
+                    <h5 class="resume-section-title">자격증</h5>
+                    <table class="resume-header-table">
+                        <thead>
+                        <tr>
+                            <th>취득연도</th>
+                            <th>자격증</th>
+                            <th>등급</th>
+                            <th>발행처</th>
+                        </tr>
+                        </thead>
+                        <tbody id="previewCertificateContainer"></tbody>
+                    </table>
+
+                    <h5 class="resume-section-title">학력</h5>
+                    <table class="resume-header-table">
+                        <thead>
+                        <tr>
+                            <th>학교명</th>
+                            <th>전공</th>
+                            <th>학위</th>
+                            <th>재학기간</th>
+                            <th>학점</th>
+                        </tr>
+                        </thead>
+                        <tbody id="previewEducationContainer"></tbody>
+                    </table>
+
+                </div>
+            </div>
+
+
+            <div id="previewSelfIntroContent" style="display:none; margin-top:20px;">
+                <div class="preview-card">
+
+                    <div class="preview-title">자기소개서</div>
+
+                    <div class="self-intro-content">
+
+                        <div class="intro-header">
+                            <div class="intro-title">항목</div>
+                            <div class="intro-title-content">내용</div>
+                        </div>
+
+                        <div class="intro-item">
+                            <div class="intro-title">성장과정</div>
+                            <div class="intro-text" id="previewGrowth">입력하세요</div>
+                        </div>
+
+                        <div class="intro-item">
+                            <div class="intro-title">지원동기</div>
+                            <div class="intro-text" id="previewMotivation">입력하세요</div>
+                        </div>
+
+                        <div class="intro-item">
+                            <div class="intro-title">성격의 장단점</div>
+                            <div class="intro-text" id="previewPersonality">입력하세요</div>
+                        </div>
+
+                        <div class="intro-item">
+                            <div class="intro-title">입사 후 포부</div>
+                            <div class="intro-text" id="previewFuture">입력하세요</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+
+        let previewResumeContent = null;
+        let previewSelfIntroContent = null;
+
+        const resumeDataFromServer = /*[[${resume}]]*/ {};
+
+        function updatePreviewBasic() {
+            document.getElementById("previewName").textContent =
+                document.getElementById("name").value;
+
+            document.getElementById("previewBirthday").textContent =
+                document.getElementById("birthday").value;
+
+            document.getElementById("previewPhone").textContent =
+                document.getElementById("phone").value;
+
+            document.getElementById("previewEmail").textContent =
+                document.getElementById("email").value;
+
+            document.getElementById("previewAddress").textContent =
+                document.getElementById("address").value;
+        }
+
+
+function updateSelfIntroPreview(field) {
+            const textarea = document.getElementById(field);
+            const previewId = "preview" + field.charAt(0).toUpperCase() + field.slice(1);
+            const counterId = field + "Counter";
+            const currentLength = textarea.value.length;
+            const maxLength = textarea.getAttribute('maxlength') || 1000;
+
+            document.getElementById(previewId).textContent = textarea.value;
+
+            document.getElementById(counterId).textContent = `${currentLength} / ${maxLength} 자`;
+
+            if (currentLength > maxLength) {
+                document.getElementById(counterId).classList.add('text-danger');
+            } else {
+                document.getElementById(counterId).classList.remove('text-danger');
+            }
+        }
+
+        function previewPhotoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById("photoPreview").src = e.target.result;
+                document.getElementById("previewPhoto").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function deletePhoto() {
+            document.getElementById("photoPreview").src = "/images/default-photo.png";
+            document.getElementById("previewPhoto").src = "/images/default-photo.png";
+
+            document.getElementById("photoInput").value = "";
+            document.getElementById("deletePhotoFlag").value = "true";
+        }
+
+
+        function addRow(type, data = {}) {
+            const container = document.getElementById(`${type}Container`);
+            let html = `<div class="dynamic-row">`;
+
+if (type === "skills") {
+    html += `
+        <input type="text" placeholder="기술명" class="form-control"
+            value="${data.skillName || data.program || ''}"
+            oninput="updatePreviewDynamic('skills')">
+
+        <input type="text" placeholder="수준" class="form-control"
+            value="${data.level || ''}"
+            oninput="updatePreviewDynamic('skills')">
+
+        <input type="text" placeholder="비고" class="form-control"
+            value="${data.note || ''}"
+            oninput="updatePreviewDynamic('skills')">
+    `;
+}
+
+
+            if (type === "certificate") {
+                html += `
+                    <input type="text" placeholder="자격증명" class="form-control"
+                        value="${data.name || ''}"
+                        oninput="updatePreviewDynamic('certificate')">
+                    <input type="text" placeholder="발급기관" class="form-control"
+                        value="${data.issuer || ''}"
+                        oninput="updatePreviewDynamic('certificate')">
+                    <input type="text" placeholder="취득연도" class="form-control"
+                        value="${data.year || ''}"
+                        oninput="updatePreviewDynamic('certificate')">
+                    <input type="text" placeholder="등급" class="form-control"
+                        value="${data.grade || ''}"
+                        oninput="updatePreviewDynamic('certificate')">
+                `;
+            }
+
+            if (type === "education") {
+                html += `
+                    <input type="text" placeholder="학교명" class="form-control"
+                        value="${data.school || ''}"
+                        oninput="updatePreviewDynamic('education')">
+                    <input type="text" placeholder="전공" class="form-control"
+                        value="${data.major || ''}"
+                        oninput="updatePreviewDynamic('education')">
+                    <input type="text" placeholder="학위" class="form-control"
+                        value="${data.degree || ''}"
+                        oninput="updatePreviewDynamic('education')">
+                    <input type="text" placeholder="기간" class="form-control"
+                        value="${data.duration || ''}"
+                        oninput="updatePreviewDynamic('education')">
+                    <input type="text" placeholder="학점" class="form-control"
+                        value="${data.grade || ''}"
+                        oninput="updatePreviewDynamic('education')">
+                `;
+            }
+
+            html += `<button class="btn btn-danger btn-sm" onclick="removeRow(this)">-</button></div>`;
+            container.insertAdjacentHTML("beforeend", html);
+        }
+
+        function removeRow(btn) {
+            const row = btn.closest(".dynamic-row");
+            const container = row.parentElement;
+            const type = container.id.replace("Container", "");  // skillsContainer → skills
+
+            row.remove();
+
+            updatePreviewDynamic(type);
+        }
+
+        function updatePreviewDynamic(type) {
+            const rows = document.querySelectorAll(`#${type}Container .dynamic-row`);
+            const preview = document.getElementById(`preview${type.charAt(0).toUpperCase() + type.slice(1)}Container`);
+
+            let html = "<table class='resume-header-table'><tbody>";
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input");
+                html += "<tr>";
+                inputs.forEach(i => html += `<td>${i.value || "-"}</td>`);
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+            preview.innerHTML = html;
+        }
+
+
+        function collectDynamic(type) {
+            const rows = document.querySelectorAll(`#${type}Container .dynamic-row`);
+            const list = [];
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll("input");
+                const obj = {};
+
+                if (type === "skills") {
+                    obj.skillName = inputs[0].value;
+                    obj.level = inputs[1].value;
+                    obj.note = inputs[2].value;
+                }
+
+                if (type === "certificate") {
+                    obj.name = inputs[0].value;
+                    obj.issuer = inputs[1].value;
+                    obj.year = inputs[2].value;
+                    obj.grade = inputs[3].value;
+                }
+
+                if (type === "education") {
+                    obj.school = inputs[0].value;
+                    obj.major = inputs[1].value;
+                    obj.degree = inputs[2].value;
+                    obj.duration = inputs[3].value;
+                    obj.grade = inputs[4].value;
+                }
+
+                list.push(obj);
+            });
+
+            return list;
+        }
+
+
+ document.addEventListener("DOMContentLoaded", () => {
+
+    previewResumeContent = document.getElementById("previewResumeContent");
+    previewSelfIntroContent = document.getElementById("previewSelfIntroContent");
+
+    const selfIntroFields = ["growth", "motivation", "personality", "future"];
+
+    document.getElementById("editTabs").addEventListener("shown.bs.tab", e => {
+
+        if (!previewResumeContent || !previewSelfIntroContent) {
+            console.error("탭 전환 오류: 미리보기 컨테이너를 찾을 수 없습니다.");
+            return;
+        }
+
+        if (e.target.id === "resume-tab") {
+            previewResumeContent.style.display = "block";
+            previewSelfIntroContent.style.display = "none";
+        } else { // selfintro-tab이 눌렸을 때
+            previewResumeContent.style.display = "none";
+            previewSelfIntroContent.style.display = "block";
+
+            selfIntroFields.forEach(field => {
+                updateSelfIntroAll(field);
+            });
+        }
+    });
+
+            const skillsList = resumeDataFromServer.skills ? JSON.parse(resumeDataFromServer.skills) : [{}];
+            skillsList.forEach(i => addRow("skills", i));
+
+            const certsList = resumeDataFromServer.certificates ? JSON.parse(resumeDataFromServer.certificates) : [{}];
+            certsList.forEach(i => addRow("certificate", i));
+
+            const eduList = resumeDataFromServer.educations ? JSON.parse(resumeDataFromServer.educations) : [{}];
+            eduList.forEach(i => addRow("education", i));
+
+            updatePreviewDynamic("skills");
+            updatePreviewDynamic("certificate");
+            updatePreviewDynamic("education");
+
+            updatePreviewBasic();
+
+            updateSelfIntroAll("growth");
+            updateSelfIntroAll("motivation");
+            updateSelfIntroAll("personality");
+            updateSelfIntroAll("future");
+            });
+
+
+        document.getElementById("saveBtnResume").addEventListener("click", () => {
+
+    const id = document.getElementById("resumeId").value;
+    const formData = new FormData();
+
+    formData.append("title", document.getElementById("title").value);
+    formData.append("name", document.getElementById("name").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("phone", document.getElementById("phone").value);
+    formData.append("birthday", document.getElementById("birthday").value);
+    formData.append("address", document.getElementById("address").value);
+
+    formData.append("skills", JSON.stringify(collectDynamic("skills")));
+    formData.append("certificates", JSON.stringify(collectDynamic("certificate")));
+    formData.append("educations", JSON.stringify(collectDynamic("education")));
+
+    formData.append("growth", document.getElementById("growth").value);
+    formData.append("motivation", document.getElementById("motivation").value);
+    formData.append("personality", document.getElementById("personality").value);
+    formData.append("future", document.getElementById("future").value);
+
+    const photoFile = document.getElementById("photoInput").files[0];
+    if (photoFile) {
+        formData.append("photoFile", photoFile);
+    }
+    formData.append("deletePhotoFlag", document.getElementById("deletePhotoFlag").value);
+
+    fetch(`/resume/edit/${id}`, {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("업데이트 실패!");
+        return res.text();
+    })
+    .then(() => {
+        alert("수정 완료");
+        window.location.href = "/resume/my";
+    })
+    .catch(err => {
+        console.error(err);
+        alert("저장 실패: 서버 오류 발생");
+    });
+});
+        document.getElementById("saveBtnSelfIntro").addEventListener("click", () => {
+
+    const id = document.getElementById("resumeId").value;
+
+    const formData = new FormData();
+
+    formData.append("title", document.getElementById("title").value);
+    formData.append("name", document.getElementById("name").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("phone", document.getElementById("phone").value);
+    formData.append("birthday", document.getElementById("birthday").value);
+    formData.append("address", document.getElementById("address").value);
+
+    formData.append("skills", JSON.stringify(collectDynamic("skills")));
+    formData.append("certificates", JSON.stringify(collectDynamic("certificate")));
+    formData.append("educations", JSON.stringify(collectDynamic("education")));
+
+    formData.append("growth", document.getElementById("growth").value);
+    formData.append("motivation", document.getElementById("motivation").value);
+    formData.append("personality", document.getElementById("personality").value);
+    formData.append("future", document.getElementById("future").value);
+
+    const photoFile = document.getElementById("photoInput").files[0];
+    if (photoFile) {
+        formData.append("photoFile", photoFile);
+    }
+    formData.append("deletePhotoFlag", document.getElementById("deletePhotoFlag").value);
+
+    fetch(`/resume/edit/${id}`, {
+        method: "POST",
+        body: formData
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("업데이트 실패!");
+            return res.text();
+        })
+        .then(() => {
+            alert("자기소개서 수정 완료");
+            window.location.href = "/resume/my";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("저장 실패: 서버 오류 발생");
+        });
+});
+function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        }
+
+        function updateSelfIntroAuto(field) {
+            const el = document.getElementById(field);
+            autoResize(el);
+            updateSelfIntroPreview(field);
+        }
+function updateSelfIntroAll(field) {
+    const textarea = document.getElementById(field);
+    const previewId = "preview" + field.charAt(0).toUpperCase() + field.slice(1);
+    const counterId = field + "Counter";
+
+    const max = 800;
+    const len = textarea.value.length;
+
+    document.getElementById(previewId).textContent = textarea.value;
+
+    const counter = document.getElementById(counterId);
+    counter.textContent = `${len} / ${max} 자`;
+
+    // 800자 도달 시 빨간색으로 바뀌도록
+    if (len >= max) {
+        counter.classList.add("text-danger");
+    } else {
+        counter.classList.remove("text-danger");
+    }
+
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+}
+
+    </script>
+</th:block>
+
+</html>

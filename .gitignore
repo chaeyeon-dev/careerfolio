@@ -35,3 +35,24 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### CareerFolio 추가 ###
+# 업로드된 파일들 (사용자 데이터)
+uploads/
+
+# 환경 변수 / 민감 정보
+.env
+.env.local
+application-local.yml
+application-local.properties
+application-secret.yml
+application-prod.yml
+
+# 로그 파일
+*.log
+logs/
+
+# OS 관련
+.DS_Store
+Thumbs.db
+desktop.ini

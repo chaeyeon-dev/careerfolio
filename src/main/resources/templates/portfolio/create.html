@@ -1,81 +1,128 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layouts/layout :: layout(~{::content})">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="ko"
+      layout:decorate="~{layouts/layout}">
 
 <head>
-    <title>포트폴리오 작성 - CareerFolio</title>
+    <title>포트폴리오 작성</title>
+
+    <style>
+
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            padding-top: 70px;
+            padding-bottom: 100px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .tips-box {
+            background: #EEF1FF;
+            padding: 18px 24px;
+            border-radius: 12px;
+            border-left: 6px solid #3B6EFF;
+            margin: 24px 0 32px 0;
+        }
+
+        textarea.form-control {
+            min-height: 250px !important;
+            resize: none;
+            overflow-y: hidden;
+        }
+
+        .btn-submit {
+            background: #1A73E8;
+            padding: 12px 20px;
+            font-size: 1.12rem;
+            font-weight: 700;
+            border-radius: 10px;
+            width: 160px;
+        }
+
+        .btn-cancel {
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
-<th:block th:fragment="content">
+<th:block layout:fragment="content">
 
-    <div class="container" style="max-width: 800px; margin-top: 30px;">
-        <div class="card shadow-sm p-4">
+    <div class="page-wrapper">
 
-            <h2 class="fw-bold mb-4">포트폴리오 작성</h2>
+        <div class="section-title">포트폴리오 작성</div>
 
-            <!-- 🔥 파일 업로드를 위해 enctype="multipart/form-data" 필수 -->
-            <form method="post"
-                  th:action="@{/portfolio/create}"
-                  enctype="multipart/form-data">
+        <form th:action="@{/portfolio/create}" method="post" enctype="multipart/form-data">
 
-                <!-- 제목 -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">제목</label>
-                    <input type="text"
-                           name="title"
-                           class="form-control"
-                           placeholder="포트폴리오 제목을 입력하세요"
-                           required>
-                </div>
 
-                <!-- 내용 -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">내용</label>
-                    <textarea name="content"
-                              class="form-control"
-                              rows="10"
-                              placeholder="프로젝트 설명, 사용 기술, 역할 등을 작성하세요."
-                              required></textarea>
-                </div>
+            <label class="form-label fw-semibold">제목 *</label>
+            <input type="text" name="title" class="form-control mb-3"
+                   placeholder="예: 웹 개발 프로젝트 - 쇼핑몰 구축" required>
 
-                <!-- 썸네일 업로드 -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">썸네일 이미지 업로드</label>
-                    <input type="file"
-                           name="thumbnail"
-                           class="form-control"
-                           accept="image/*">
-                </div>
+            <div class="tips-box">
+                <div class="fw-bold fs-6">💡 작성 팁</div>
+                <ul class="mt-2">
+                    <li>프로젝트명과 역할을 명확하게 작성하세요.</li>
+                    <li>사용한 기술 스택과 도구를 포함하세요.</li>
+                    <li>구현 기능과 해결한 문제를 강조하세요.</li>
+                    <li>가능하면 수치화된 성과를 포함하세요.</li>
+                </ul>
+            </div>
 
-                <!-- 🔥 PDF 업로드 추가됨 -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">포트폴리오 PDF 업로드</label>
-                    <input type="file"
-                           name="pdfFile"
-                           class="form-control"
-                           accept="application/pdf">
-                </div>
+            <label class="form-label fw-semibold">내용 *</label>
+            <textarea name="content" class="form-control mb-3"
+                      placeholder="프로젝트 설명, 사용 기술, 역할, 성과 등을 자세히 작성해주세요...
 
-                <!-- 공개 여부 -->
-                <div class="form-check mb-4">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           name="isPublic"
-                           value="true"
-                           id="publicCheck">
-                    <label class="form-check-label" for="publicCheck">
-                        공개 포트폴리오로 설정
-                    </label>
-                </div>
+예시:
+• 프로젝트 개요: React와 Node.js를 활용한 전자상거래 플랫폼 개발
+• 주요 기술: React, Redux, Node.js, MongoDB, AWS
+• 담당 역할: 프론트엔드 개발 리드
+• 주요 성과: 사용자 경험 개선으로 전환율 25% 향상"
+                      required></textarea>
 
-                <!-- 제출 -->
-                <button type="submit" class="btn btn-primary w-100">
-                    저장하기
-                </button>
+            <label class="form-label fw-semibold">파일 업로드</label>
+            <input type="file" name="file" class="form-control mb-2"
+                   accept=".pdf,.jpg,.jpeg,.png">
+            <div class="form-text mb-3">PDF, JPG, PNG 파일만 업로드 가능합니다.</div>
 
-            </form>
+            <label class="form-label fw-semibold mt-3">GitHub URL</label>
+            <input type="text" name="githubUrl" class="form-control mb-3"
+                   placeholder="https://github.com/username/project">
 
-        </div>
+            <label class="form-label fw-semibold">배포 URL</label>
+            <input type="text" name="deployUrl" class="form-control mb-3"
+                   placeholder="https://example.com">
+
+            <div class="form-check mb-4">
+                <input type="checkbox" class="form-check-input" id="isPublic" name="publicState">
+                <label for="isPublic" class="form-check-label">공개 포트폴리오로 설정</label>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/" class="btn btn-outline-secondary btn-cancel">취소</a>
+                <button type="submit" class="btn btn-primary btn-submit">저장하기</button>
+            </div>
+
+        </form>
+        <script>
+            document.addEventListener("input", function (e) {
+                if (e.target.tagName.toLowerCase() !== "textarea") return;
+                e.target.style.height = "auto";
+                e.target.style.height = e.target.scrollHeight + "px";
+            });
+        </script>
     </div>
 
 </th:block>

@@ -1,90 +1,517 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layouts/layout :: layout(~{::content})">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
 
 <head>
     <title th:text="${portfolio.title} + ' - 상세보기'"></title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+
+        .detail-wrapper {
+            background: white;
+        }
+
+        .detail-header {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .portfolio-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: #212529;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meta-divider {
+            color: #dee2e6;
+        }
+
+        .detail-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #dee2e6;
+            margin-bottom: 25px;
+        }
+
+        .portfolio-content {
+            font-size: 16px;
+            color: #495057;
+            line-height: 1.8;
+            margin-bottom: 50px;
+        }
+
+        .pdf-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 60px 50px;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 85vh;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .floating-actions {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .fab-btn {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 50%;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all .2s ease;
+        }
+
+        .fab-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .fab-btn i {
+            font-size: 20px;
+        }
+
+        .fab-btn span {
+            font-size: 10px;
+        }
+
+        .like-btn.liked i,
+        .like-btn.liked span {
+            color: #ff1f3d !important;
+        }
+
+        .save-btn.saved i {
+            color: #007bff;
+        }
+        .like-btn i,
+        .like-btn span {
+            color: #333;
+        }
+
+        .like-btn.liked i,
+        .like-btn.liked span {
+            color: #ff1f3d !important;
+        }
+
+    </style>
 </head>
 
-<th:block th:fragment="content">
+<th:block layout:fragment="content">
 
-    <div class="container" style="max-width: 900px; margin-top: 40px;">
+    <div class="floating-actions"
+         th:if="${username != null and !isOwner}">
 
-        <div class="card shadow-sm p-4">
+        <div class="fab-btn like-btn"
+             id="likeBtn"
+             th:classappend="${alreadyLiked} ? ' liked' : ''"
+             th:onclick="'toggleLike(' + ${portfolio.id} + ')'">
+            <i class="bi bi-heart-fill"></i>
+            <span id="likeCount">[[${portfolio.likeCount}]]</span>
+        </div>
 
-            <!-- 🔥 제목 -->
-            <h2 class="fw-bold mb-2" th:text="${portfolio.title}"></h2>
+        <div class="fab-btn save-btn"
+             th:classappend="${favoriteSaved != null && favoriteSaved ? 'saved' : ''}"
+             th:onclick="'saveBookmark(' + ${portfolio.id} + ')'"
+             id="saveBtn">
+            <i class="bi bi-bookmark-fill"></i>
+            <span>저장</span>
+        </div>
 
-            <!-- 🔥 공개/비공개 뱃지 -->
-            <div class="mb-2">
-                <span th:if="${portfolio.isPublic}" class="badge bg-success">공개</span>
-                <span th:unless="${portfolio.isPublic}" class="badge bg-secondary">비공개</span>
+        <div class="fab-btn" onclick="sharePage()">
+            <i class="bi bi-share-fill"></i>
+            <span>공유</span>
+        </div>
+    </div>
+
+    <div class="floating-actions"
+         th:if="${username != null and isOwner}">
+
+        <a th:href="@{|/portfolio/edit/${portfolio.id}|}" class="fab-btn">
+            <i class="bi bi-pencil-square"></i>
+            <span>수정</span>
+        </a>
+
+        <form th:action="@{|/portfolio/delete/${portfolio.id}|}" method="post">
+            <button class="fab-btn"
+                    onclick="return confirm('정말 삭제하시겠습니까?');">
+                <i class="bi bi-trash-fill"></i>
+                <span>삭제</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="detail-wrapper">
+
+        <div class="detail-header">
+            <h1 class="portfolio-title">[[${portfolio.title}]]</h1>
+
+            <div class="meta-info">
+                <span><i class="bi bi-person"></i> [[${portfolio.member.name}]]</span>
+                <span class="meta-divider">·</span>
+                <span><i class="bi bi-calendar3"></i>
+                    [[${#temporals.format(portfolio.createdAt,'yyyy-MM-dd HH:mm')}]]
+                </span>
+                <span class="meta-divider">·</span>
+                <span>
+            <i class="bi bi-eye"></i>
+            조회수 [[${portfolio.views}]]
+
+            <span class="meta-divider">·</span>
+
+            <span th:text="${portfolio.publicState ? '공개' : '비공개'}"></span>
+        </span>
             </div>
+        </div>
 
-            <!-- 🔥 작성자 + 날짜 + 조회수 -->
-            <div class="text-muted mb-4">
-                <span th:text="'작성자: ' + ${portfolio.member.username}"></span>
-                &nbsp; | &nbsp;
-                <span th:text="${#temporals.format(portfolio.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                &nbsp; | &nbsp;
-                <span th:text="'조회수: ' + ${portfolio.views}"></span>
+        <div class="detail-content" th:if="${portfolio.content != null}">
+            <div class="section-header">
+                <i class="bi bi-file-text"></i>
+                <span>포트폴리오 소개</span>
             </div>
-
-            <hr>
-
-            <!-- 🔥 썸네일 이미지 표시 -->
-            <div class="mb-4 text-center">
-                <img th:if="${portfolio.thumbnailUrl != null}"
-                     th:src="@{${portfolio.thumbnailUrl}}"
-                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px;">
-
-                <img th:if="${portfolio.thumbnailUrl == null}"
-                     src="/images/default-thumbnail.jpg"
-                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px;">
-            </div>
-
-            <hr>
-
-            <!-- 🔥 내용 -->
-            <div class="mt-4" style="white-space: pre-line; font-size: 1.1rem;"
+            <div class="portfolio-content"
+                 style="white-space: pre-wrap;"
                  th:text="${portfolio.content}">
             </div>
+        </div>
+        <div class="detail-content" style="margin-top: 10px;">
+            <div class="section-header">
+                <i class="bi bi-link-45deg"></i>
+                <span>프로젝트 링크</span>
+            </div>
 
-            <hr>
+            <div style="font-size:16px; line-height: 1.8;">
 
-            <div class="mt-3 d-flex justify-content-between">
-
-                <!-- 🔥 목록으로 -->
-                <a href="/portfolio/my" class="btn btn-secondary">
-                    목록으로
-                </a>
-
-                <div>
-
-                    <!-- 🔥 수정 버튼 -->
-                    <a th:if="${#authentication.name == portfolio.member.username}"
-                       th:href="@{|/portfolio/edit/${portfolio.id}|}"
-                       class="btn btn-primary me-2">
-                        수정하기
+                <div th:if="${portfolio.githubUrl != null && portfolio.githubUrl != ''}">
+                    <i class="bi bi-github"></i>
+                    <strong> GitHub: </strong>
+                    <a th:href="${portfolio.githubUrl}" target="_blank" style="color:#0d6efd;">
+                        [[${portfolio.githubUrl}]]
                     </a>
+                </div>
 
-                    <!-- 🔥 삭제 버튼 -->
-                    <form th:if="${#authentication.name == portfolio.member.username}"
-                          th:action="@{|/portfolio/delete/${portfolio.id}|}"
-                          method="post"
-                          style="display:inline-block;">
-                        <button class="btn btn-danger"
-                                onclick="return confirm('정말 삭제하시겠습니까?');">
-                            삭제하기
-                        </button>
-                    </form>
+                <div th:if="${portfolio.deployUrl != null && portfolio.deployUrl != ''}" style="margin-top: 8px;">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <strong> 배포 링크: </strong>
+                    <a th:href="${portfolio.deployUrl}" target="_blank" style="color:#0d6efd;">
+                        [[${portfolio.deployUrl}]]
+                    </a>
+                </div>
 
+            </div>
+        </div>
+
+        <div class="pdf-section" th:if="${portfolio.fileUrl != null}">
+            <div class="section-header">
+                <i class="bi bi-paperclip"></i>
+                <span>첨부 문서</span>
+            </div>
+
+            <img th:if="${#strings.endsWith(portfolio.fileUrl, '.png')
+              or #strings.endsWith(portfolio.fileUrl, '.jpg')
+              or #strings.endsWith(portfolio.fileUrl, '.jpeg')}"
+                 th:src="@{${portfolio.fileUrl}}"
+                 style="max-width:100%; border-radius:8px; margin-bottom:20px;" />
+
+            <embed th:if="${#strings.endsWith(portfolio.fileUrl, '.pdf')}"
+                   th:src="@{${portfolio.fileUrl}}"
+                   type="application/pdf"
+                   class="pdf-viewer">
+        </div>
+        <div class="detail-content" style="padding-top:20px;">
+
+            <div class="section-header">
+                <i class="bi bi-chat-dots"></i>
+                <span>댓글</span>
+            </div>
+
+            <div id="commentList">
+                <div th:if="${#lists.isEmpty(comments)}" class="text-muted">
+                    작성된 댓글이 없습니다.
+                </div>
+
+                <div th:each="c : ${comments}" class="comment-box">
+                    <div class="comment-header">
+                        <strong>[[${c.member.name}]]</strong>
+                        <span class="comment-date">[[${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}]]</span>
+                        <span th:if="${username != null && username == c.member.username}">
+                        <button class="btn btn-sm btn-outline-primary"
+                                th:onclick="'editComment(' + ${c.id} + ')'">수정</button>
+                        <button class="btn btn-sm btn-outline-danger"
+                                th:onclick="'deleteComment(' + ${c.id} + ')'">삭제</button>
+                    </span>
+                    </div>
+
+                    <div class="comment-content"
+                         th:id="'comment-content-' + ${c.id}">
+                        [[${c.content}]]
+                    </div>
                 </div>
             </div>
 
+            <hr>
+
+            <div th:if="${username != null}">
+        <textarea id="commentInput" class="form-control"
+                  rows="3" placeholder="댓글을 입력하세요"></textarea>
+
+                <button class="btn btn-primary mt-2"
+                        id="commentBtn"
+                        th:data-portfolio-id="${portfolio.id}"
+                        th:data-username="${username}">
+                    댓글 등록
+                </button>
+
+            </div>
+
+            <div th:if="${username == null}" class="text-muted">
+                로그인한 사용자만 댓글을 작성할 수 있습니다.
+            </div>
         </div>
+
+        <style>
+            .comment-box {
+                padding: 15px 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .comment-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .comment-date {
+                font-size: 12px;
+                color: #6c757d;
+            }
+
+            .comment-content {
+                margin-top: 5px;
+                font-size: 15px;
+                color: #333;
+                line-height: 1.6;
+            }
+        </style>
+
     </div>
 
 </th:block>
 
+<th:block layout:fragment="script">
+    <script>
+
+        function toggleLike(id) {
+            fetch(`/portfolio/like/${id}`, {method: "POST"})
+                .then(r => r.json())
+                .then(data => {
+                    const btn = document.getElementById("likeBtn");
+
+                    if (data.result === "forbidden") {
+                        alert("본인 글에는 좋아요를 누를 수 없습니다.");
+                        return;
+                    }
+
+                    document.getElementById("likeCount").innerText = data.likeCount;
+
+                    if (data.result === "liked") btn.classList.add("liked");
+                    else btn.classList.remove("liked");
+                });
+        }
+
+        function saveBookmark(portfolioId) {
+
+    fetch('/portfolio/toggleFavorite/' + portfolioId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+
+            const btn = document.querySelector('.save-btn');
+
+            if (data.saved === true) {
+                // 저장되었을때 파란색
+                btn.classList.add('saved');
+                alert("포트폴리오가 저장되었습니다.");
+            } else {
+                // 저장 취소 되면 회색
+                btn.classList.remove('saved');
+                alert("저장이 취소되었습니다.");
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert("저장 기능에 문제가 발생했습니다. 다시 시도해주세요.");
+        });
+}
+        function sharePage() {
+            navigator.clipboard.writeText(location.href)
+                .then(() => alert("링크가 복사되었습니다!"));
+        }
+    function writeComment(portfolioId, username) {
+
+    if (!username || username === "null" || username === "") {
+        alert("로그인한 사용자만 댓글을 작성할 수 있습니다.");
+        return;
+    }
+
+    const content = document.getElementById("commentInput").value.trim();
+
+    if (!content) {
+        alert("댓글을 입력해주세요.");
+        return;
+    }
+
+    fetch(`/portfolio/${portfolioId}/comments`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ content: content })
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.result === "ok") {
+                location.reload();
+            } else {
+                alert("댓글 등록 중 오류가 발생했습니다.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("요청에 실패했습니다.");
+        });
+}
+
+
+
+    function deleteComment(id) {
+        if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+        fetch(`/portfolio/comments/${id}`, {method: "DELETE"})
+            .then(r => r.json())
+            .then(data => {
+                if (data.result === "ok") {
+                    location.reload();
+                } else {
+                    alert("삭제 권한이 없습니다.");
+                }
+            });
+    }
+
+        document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.getElementById("commentBtn");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+        const portfolioId = btn.dataset.portfolioId;
+        const username = btn.dataset.username;
+
+        writeComment(portfolioId, username);
+    });
+});
+function editComment(id) {
+    const contentDiv = document.getElementById("comment-content-" + id);
+    const oldContent = contentDiv.innerText.trim();
+
+    if (contentDiv.dataset.editing === "true") return;
+
+    contentDiv.dataset.editing = "true";
+
+    contentDiv.style.display = "none";
+
+    const editBox = document.createElement("div");
+    editBox.id = "edit-box-" + id;
+
+    editBox.innerHTML = `
+        <textarea class="form-control" id="edit-input-${id}" rows="2">${oldContent}</textarea>
+        <div class="mt-2">
+            <button class="btn btn-sm btn-primary" onclick="saveEditedComment(${id})">저장</button>
+            <button class="btn btn-sm btn-secondary" onclick="cancelEditComment(${id})">취소</button>
+        </div>
+    `;
+
+    contentDiv.parentNode.insertBefore(editBox, contentDiv.nextSibling);
+}
+
+function saveEditedComment(id) {
+    const newContent = document.getElementById("edit-input-" + id).value.trim();
+
+    if (!newContent) {
+        alert("내용을 입력해주세요.");
+        return;
+    }
+
+    fetch(`/portfolio/comments/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({content: newContent})
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.result === "ok") {
+                location.reload();
+            } else {
+                alert("댓글 수정 권한이 없습니다.");
+            }
+        });
+}
+
+function cancelEditComment(id) {
+    const contentDiv = document.getElementById("comment-content-" + id);
+    const editBox = document.getElementById("edit-box-" + id);
+
+    contentDiv.dataset.editing = "false";
+    contentDiv.style.display = "block";
+
+    if (editBox) editBox.remove();
+}
+    </script>
+</th:block>
 </html>

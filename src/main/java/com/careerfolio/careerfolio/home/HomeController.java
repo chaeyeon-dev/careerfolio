@@ -1,6 +1,6 @@
-package com.careerfolio.careerfolio.home.controller;
+package com.careerfolio.careerfolio.home;
 
-import com.careerfolio.careerfolio.home.service.HomeService;
+import com.careerfolio.careerfolio.portfolio.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final HomeService homeService;
+    private final PortfolioService portfolioService;
 
     @GetMapping("/")
     public String home(Model model) {
-        String welcome = homeService.getWelcomeMessage();
-        model.addAttribute("welcome", welcome);
-        return "home/index"; // templates/home/index.html
+
+
+        return "home/index";
     }
 }

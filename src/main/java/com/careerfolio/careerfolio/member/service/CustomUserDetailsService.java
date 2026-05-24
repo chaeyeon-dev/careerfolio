@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return User.builder()
                 .username(member.getUsername())
                 .password(member.getPassword())
-                .roles("USER")   // 🔥 이 줄만 이렇게 바꾸면 완벽하게 해결됨!
+                .roles("USER")
                 .build();
     }
 }

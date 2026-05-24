@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}">
+
+<th:block layout:fragment="content">
+
+    <style>
+        .edit-container {
+            max-width: 600px;
+            margin: 60px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .edit-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .btn-save {
+            background: #1A73E8;
+            color: white;
+            font-weight: 600;
+        }
+        .btn-save:hover {
+            background: #1558b0;
+            color: white;
+        }
+    </style>
+
+    <div class="edit-container">
+
+        <h2 class="edit-title">계정 정보 수정</h2>
+        <hr>
+
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+
+        <form th:action="@{/member/edit}" method="post">
+
+            <div class="mb-3">
+                <label class="form-label">이름</label>
+                <input type="text" class="form-control"
+                       name="name" th:value="${member.name}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">이메일</label>
+                <input type="email" class="form-control"
+                       name="email" th:value="${member.email}">
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-save w-50" type="submit">저장하기</button>
+                <a href="/member/mypage" class="btn btn-outline-secondary w-50">취소</a>
+            </div>
+        </form>
+
+    </div>
+
+</th:block>
+
+</html>

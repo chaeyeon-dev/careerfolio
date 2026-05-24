@@ -1,18 +1,242 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layouts/layout :: layout(~{::content})">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}"
+      lang="ko">
 
-<head>
-    <title>CareerFolio 메인 페이지</title>
-</head>
+<th:block layout:fragment="content">
 
-<th:block th:fragment="content">
+    <style>
+        h1, h2, h3, p {
+            margin: 0;
+            padding: 0;
+        }
 
-    <div class="container mt-5">
-        <h1 class="fw-bold">CareerFolio 메인 페이지</h1>
-        <p>포트폴리오와 이력서를 한 곳에서 편하게 관리하세요.</p>
-    </div>
+
+
+        /* =============================== Product Shot Hero =============================== */
+        .product-hero {
+            padding: 120px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            width: 100%;
+            padding: 0 40px;
+            align-items: center;
+        }
+
+        /* =============================== Hero Text =============================== */
+        .hero-text-box h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.3;
+            color: #111;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+
+        .accent {
+            color: #0066FF;
+        }
+
+        .hero-text-box p {
+            font-size: 1.22rem;
+            margin-bottom: 40px;
+            color: #555;
+            line-height: 1.65;
+            max-width: 550px;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 14px 30px;
+            border-radius: 9px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: white;
+            background: #0066FF;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+        .hero-btn:hover {
+            background: #3388FF;
+        }
+
+        /* =============================== Product Image =============================== */
+        .product-shot-box {
+            text-align: center;
+        }
+
+        .product-img {
+            width: 90%;
+            max-width: 520px;
+            border-radius: 22px;
+            transition: .3s;
+        }
+
+
+        /* =============================== 스크롤 등장 애니메이션 =============================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =============================== 기능 카드 =============================== */
+        .feature-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px 30px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #111;
+        }
+
+        .feature-desc {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.55;
+        }
+
+        /* =============================== 반응형 =============================== */
+        @media(max-width: 992px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .hero-text-box h1 {
+                font-size: 3rem;
+            }
+
+            .product-img {
+                width: 75%;
+            }
+        }
+    </style>
+
+    <section class="product-hero">
+        <div class="hero-container">
+
+            <div class="hero-text-box reveal">
+                <h1>
+                    당신의 커리어를<br>
+                    정리하는 단<br> 하나의 솔루션 <span class="accent">CareerFolio</span>
+                </h1>
+
+                <p>
+                    포트폴리오와 이력서를 쉽게 관리할 수 있는<br>
+                    직관적이고 깔끔한 서비스를 경험해보세요.
+                </p>
+
+                <div style="display: flex; gap: 12px;">
+
+                    <a href="/portfolio/create" class="hero-btn">
+                        포트폴리오 만들기
+                    </a>
+
+                    <!-- 이력서 작성 -->
+                    <a href="/resume/create"
+                       style="
+            padding: 14px 30px;
+            border-radius: 9px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0066FF;
+            background: #ffffff;
+            border: 2px solid #0066FF;
+            text-decoration: none;
+            transition: .2s;">
+                        이력서 작성
+                    </a>
+                </div>
+            </div>
+
+            <div class="product-shot-box reveal">
+                <img class="product-img"
+                     src="/images/illustration.png"
+                     alt="제품 스크린샷">
+
+            </div>
+
+        </div>
+    </section>
+
+    <section class="container py-5">
+
+        <h2 class="text-center mb-5 fw-bold" style="font-size: 2.5rem;">
+            CareerFolio 주요 기능
+        </h2>
+
+        <div class="row justify-content-center">
+
+            <div class="col-md-4 reveal">
+                <div class="feature-card">
+                    <div class="feature-title">이력서 . 포트폴리오 통합 관리</div>
+                    <p class="feature-desc">
+                        한 계정에서 모든 자료를 쉽게 관리
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4 reveal">
+                <div class="feature-card">
+                    <div class="feature-title">실시간 미리보기</div>
+                    <p class="feature-desc">
+                        입력 즉시 미리보기 반영, 작성 효율 향상
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4 reveal">
+                <div class="feature-card">
+                    <div class="feature-title">포트폴리오 공개 / 비공개 설정</div>
+                    <p class="feature-desc">
+                        공개 설정 시 링크를 통해 공유 가능
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- =============================== Reveal Script =============================== -->
+    <script>
+        function revealOnScroll() {
+            const items = document.querySelectorAll(".reveal");
+            items.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const top = el.getBoundingClientRect().top;
+
+                if (top < windowHeight * 0.85) {
+                    el.classList.add("active");
+                }
+            });
+        }
+
+        window.addEventListener("scroll", revealOnScroll);
+        window.addEventListener("load", revealOnScroll);
+    </script>
 
 </th:block>
-
 </html>

@@ -1,49 +1,62 @@
 package com.careerfolio.careerfolio.portfolio.entity;
 
 import com.careerfolio.careerfolio.member.entity.Member;
+import com.careerfolio.careerfolio.comment.entity.Comment;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
     private String content;
 
-    // 🔥 작성자 (Member 엔티티와 연결)
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private String fileUrl;
 
-    @CreationTimestamp
+    private String thumbnailUrl;
+
+    private boolean publicState;
+
+    private int views;
+
+    private int likeCount;
+
     private LocalDateTime createdAt;
 
-    // 🔥 공개 여부 (true = 공개, false = 비공개)
-    @Builder.Default
-    @Column(nullable = false)
-    private boolean isPublic = false;
+    private String authorName;
 
-    // 🔥 조회수
-    @Builder.Default
     @Column(nullable = false)
-    private int views = 0;
+    private boolean deleted = false;
 
-    // 🔥 썸네일 이미지 경로 (추가됨!)
-    private String thumbnailUrl;
-    private String pdfUrl;
+    @ManyToOne
+    private Member member;
+
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    private String githubUrl;
+    private String deployUrl;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+        if (this.member != null) {
+            this.authorName = this.member.getName();
+        }
+    }
 }

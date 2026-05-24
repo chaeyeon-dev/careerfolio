@@ -1,43 +1,114 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout :: layout(~{::content})">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout}"
+      lang="ko">
 
-<th:block th:fragment="content">
+<head>
+    <title>포트폴리오 수정</title>
 
-    <div class="container" style="max-width: 700px; margin-top: 40px;">
-        <div class="card shadow-sm p-4">
+    <style>
+        .form-box {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            max-width: 780px;
+        }
 
-            <h2 class="fw-bold mb-4">포트폴리오 수정</h2>
+        .form-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 28px;
+            color: #222;
+        }
 
-            <form th:action="@{|/portfolio/edit/${portfolio.id}|}" method="post">
+        .btn-submit {
+            margin-top: 28px;
+            padding: 12px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            border-radius: 10px;
+        }
 
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        .btn-delete-file {
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 8px;
+        }
+    </style>
+</head>
 
-                <div class="mb-3">
-                    <label class="form-label">제목</label>
-                    <input type="text" class="form-control"
-                           name="title"
-                           th:value="${portfolio.title}">
-                </div>
+<body>
 
-                <div class="mb-3">
-                    <label class="form-label">내용</label>
-                    <textarea class="form-control" name="content" rows="8"
-                              th:text="${portfolio.content}"></textarea>
-                </div>
+<th:block layout:fragment="content">
 
-                <!-- 🔥 공개 여부 체크박스 -->
-                <div class="form-check mb-4">
-                    <input class="form-check-input"
-                           type="checkbox"
+    <div class="d-flex justify-content-center mt-5 mb-5">
+        <div class="form-box">
+
+            <div class="form-title">포트폴리오 수정</div>
+
+            <form th:action="@{|/portfolio/edit/${portfolio.id}|}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <label class="form-label fw-semibold">제목</label>
+                <input type="text" name="title" class="form-control mb-4"
+                       th:value="${portfolio.title}" required>
+
+                <label class="form-label fw-semibold">내용</label>
+                <textarea name="content" rows="10" class="form-control mb-4"
+                          th:text="${portfolio.content}" required></textarea>
+
+                <div class="form-check mt-4 mb-3">
+                    <input type="checkbox" class="form-check-input"
+                           id="isPublic"
                            name="publicState"
-                           value="true"
-                           id="publicCheck"
-                           th:checked="${portfolio.public}">
-                    <label class="form-check-label" for="publicCheck">공개 포트폴리오</label>
+                           th:checked="${portfolio.publicState}">
+                    <label for="isPublic" class="form-check-label fw-bold">공개 포트폴리오</label>
                 </div>
 
-                <button class="btn btn-primary w-100">수정 완료</button>
+                <label class="form-label fw-semibold mt-4">Github 링크</label>
+                <input type="url" name="githubUrl" class="form-control mb-4"
+                       placeholder="https://github.com/..."
+                       th:value="${portfolio.githubUrl}">
+
+                <label class="form-label fw-semibold">배포 링크</label>
+                <input type="url" name="deployUrl" class="form-control mb-4"
+                       placeholder="https://myproject.com"
+                       th:value="${portfolio.deployUrl}">
+
+                <label class="form-label fw-semibold mt-4">파일 교체 (선택)</label>
+
+                <input type="file" name="file" id="fileInput"
+                       class="form-control mb-1"
+                       accept=".pdf,.jpg,.jpeg,.png">
+
+                <div id="fileNameDisplay" class="mt-1 text-secondary" style="font-size: 14px;">
+                    <span th:if="${portfolio.fileUrl != null}">
+                        [[${#strings.substring(portfolio.fileUrl, portfolio.fileUrl.lastIndexOf('/') + 1)}]]
+                    </span>
+                    <span th:if="${portfolio.fileUrl == null}">선택된 파일 없음</span>
+                </div>
+
+                <button type="button"
+                        class="btn btn-danger btn-delete-file"
+                        th:if="${portfolio.fileUrl != null}"
+                        onclick="document.getElementById('deleteFileHidden').value='true'">
+                    파일 삭제
+                </button>
+
+                <input type="hidden" id="deleteFileHidden" name="deleteFile" value="false">
+
+                <div class="form-text mb-4">PDF, JPG, PNG 파일만 업로드 가능합니다.</div>
+
+                <button type="submit" class="btn btn-primary btn-submit w-100">
+                    수정하기
+                </button>
+
             </form>
 
         </div>
@@ -45,4 +116,18 @@
 
 </th:block>
 
+<script>
+    const fileInput = document.getElementById("fileInput");
+    const display = document.getElementById("fileNameDisplay");
+
+    fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+            display.textContent = fileInput.files[0].name;
+        } else {
+            display.textContent = "선택된 파일 없음";
+        }
+    });
+</script>
+
+</body>
 </html>
