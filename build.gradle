@@ -33,9 +33,12 @@ dependencies {
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
+// 🔥 PDF 생성용 (이게 있어야 PdfRendererBuilder 인식됨)
     implementation 'com.openhtmltopdf:openhtmltopdf-core:1.0.10'
     implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
 
+    // 🔥 PDF → 이미지 변환용 (이미 들어있음)
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
     implementation 'org.apache.pdfbox:pdfbox:2.0.29'
     implementation 'org.apache.pdfbox:pdfbox-tools:2.0.29'
 
